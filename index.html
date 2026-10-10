@@ -522,6 +522,12 @@
 </head>
 <body>
 
+    <!-- ระบบดึง YouTube API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    
+    <!-- กล่องซ่อนวิดีโอ YouTube -->
+    <div id="youtube-player" style="display: none;"></div>
+
     <div id="os-container">
         <!-- Desktop Area -->
         <div id="desktop">
@@ -532,7 +538,7 @@
                     <h1 class="text-2xl sm:text-3xl font-bold mb-2">CREAMMII OS v1.0</h1>
                     <div class="text-2xl text-[var(--pink)] mb-2">♡</div>
                     <p class="mb-6 text-base sm:text-lg">A Little World<br>Made For You</p>
-                    <button class="pixel-btn pixel-btn-mint w-full" onclick="app.goToScreen('screen-password')">[ START ]</button>
+                    <button class="pixel-btn pixel-btn-mint w-full" onclick="app.playMusic(); app.goToScreen('screen-password')">[ START ]</button>
                 </div>
             </div>
 
@@ -687,7 +693,7 @@
                     
                     <div id="m5-printer-machine" class="w-full relative z-20 cursor-pointer hover:scale-105 transition-transform pointer-events-auto" onclick="app.startPrinting()">
                         <div id="m5-printer-body" class="printer-body w-full h-20 sm:h-24 flex items-center justify-between p-3 sm:p-4 relative z-20">
-                            <div class="font-bold text-base sm:text-lg text-gray-700 tracking-widest">PRINT_BOY</div>
+                            <div class="font-bold text-base sm:text-lg text-gray-700 tracking-widest">message to u</div>
                             <div class="flex gap-2 items-center">
                                 <div class="w-6 sm:w-8 h-2 sm:h-3 bg-gray-400 rounded-sm border border-gray-600"></div>
                                 <div id="printer-led" class="w-2 sm:w-3 h-2 sm:h-3 rounded-full bg-red-400 border border-gray-600 shadow-[0_0_5px_rgba(0,0,0,0.2)] transition-colors duration-300"></div>
@@ -752,10 +758,36 @@
     </div>
 
     <script>
+        // --- เพิ่มโค้ดระบบ YouTube ตรงนี้ ---
+        let ytPlayer;
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('youtube-player', {
+                videoId: 'O7JVYSsEehU', // ID ของเพลง ฮีลใจ
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 0,
+                    'loop': 1,
+                    'playlist': 'O7JVYSsEehU' // ต้องใส่ ID ตัวเองซ้ำเพื่อให้วนลูปได้
+                }
+            });
+        }
+        // ---------------------------------
+
         const app = {
             currentPassword: "",
             correctPassword: "1010",
             isBooting: false, 
+            
+            // --- แก้ไขฟังก์ชันนี้ ---
+            playMusic() {
+                if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+                    ytPlayer.setVolume(50); // ความดังปรับได้ตั้งแต่ 0 - 100
+                    ytPlayer.playVideo();
+                } else {
+                    console.log("YouTube Player ยังโหลดไม่เสร็จ");
+                }
+            },
+            // ---------------------
             
             init() {
                 this.updateTime();
