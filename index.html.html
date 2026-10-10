@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Creammii.exe - A Little World Made For You</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600&family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-bg: #FFF8EE; 
+            --lavender: #C8B6FF;
+            --purple: #9B8AFB;
+            --pink: #FFB7D5;
+            --mint: #B8E8D4;
+            --blue: #B9D9FF;
+            --yellow: #FFE69A;
+            --text-dark: #4D4668;
+            --window-bg: rgba(255, 248, 238, 0.95);
+        }
+
+        body {
+            font-family: 'Pixelify Sans', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-dark);
+            margin: 0;
+            overflow: hidden; 
+            touch-action: none; 
+            
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M4 2v16l4-4 3 7 2-1-3-7 4-1z' fill='%23FFF' stroke='%23000' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E"), auto;
+        }
+
+        button, .pixel-btn, .polaroid, .taskbar-item, .clickable {
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M10 2v3H6v3H2v6h4v3h4v3h7v-3h4v-3h3v-6h-3V5h-4V2z' fill='%23FFF' stroke='%23000' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E"), pointer !important;
+        }
+
+        .font-handwriting {
+            font-family: 'Mali', cursive;
+        }
+
+        .pixel-window {
+            background-color: var(--window-bg);
+            border: 4px solid var(--text-dark);
+            box-shadow: 6px 6px 0px var(--lavender);
+            border-radius: 0;
+            position: relative;
+        }
+
+        .pixel-window-header {
+            background-color: var(--lavender);
+            color: var(--text-dark);
+            border-bottom: 4px solid var(--text-dark);
+            padding: 4px 8px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pixel-btn {
+            background-color: var(--pink);
+            color: var(--text-dark);
+            border: 3px solid var(--text-dark);
+            box-shadow: 3px 3px 0px var(--text-dark);
+            padding: clamp(8px, 2vh, 12px) clamp(12px, 3vw, 20px);
+            font-family: 'Pixelify Sans', sans-serif;
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            cursor: pointer;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+        }
+
+        .pixel-btn:active, .pixel-btn.active-key {
+            transform: translate(3px, 3px);
+            box-shadow: 0px 0px 0px var(--text-dark);
+        }
+
+        .pixel-btn-purple { background-color: var(--purple); color: white; }
+        .pixel-btn-mint { background-color: var(--mint); }
+        .pixel-btn-yellow { background-color: var(--yellow); }
+
+        #os-container {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            min-height: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-image: radial-gradient(var(--lavender) 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-position: 0 0;
+        }
+
+        #desktop {
+            flex: 1 1 auto;
+            min-width: 0;
+            min-height: 0;
+            width: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: clamp(8px, 2vw, 20px);
+            overflow: hidden;
+        }
+
+        #taskbar {
+            flex: 0 0 clamp(40px, 8vh, 50px);
+            min-width: 0;
+            background-color: var(--lavender);
+            border-top: 4px solid var(--text-dark);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .taskbar-item {
+            background-color: var(--primary-bg);
+            border: 2px solid var(--text-dark);
+            padding: clamp(2px, 1vh, 4px) clamp(6px, 2vw, 12px);
+            font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+            opacity: 0.5; 
+        }
+        .taskbar-item.active {
+            opacity: 1;
+            box-shadow: inset 2px 2px 0px rgba(0,0,0,0.1);
+            background-color: var(--pink);
+        }
+
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(6px, 2vw, 12px);
+            margin-top: 20px;
+        }
+        
+        .keypad-grid button {
+            padding: clamp(10px, 3vh, 16px) 0;
+            font-size: clamp(1.1rem, 5vw, 1.4rem);
+        }
+
+        .terminal-text {
+            font-family: 'Courier New', Courier, monospace; 
+            color: var(--mint);
+            background: var(--text-dark);
+            padding: clamp(12px, 3vw, 20px);
+            border: 4px solid var(--text-dark);
+            box-shadow: 6px 6px 0px var(--purple);
+            width: 90%;
+            max-width: 500px;
+            height: clamp(200px, 50vh, 300px);
+            overflow-y: auto;
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
+            text-align: left;
+        }
+        .terminal-text::-webkit-scrollbar { display: none; }
+
+        .blinking-cursor::after {
+            content: '█';
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        #m1-main-content {
+            touch-action: pan-y;
+        }
+        .polaroid {
+            background: white;
+            padding: 8px 8px clamp(20px, 5vh, 28px) 8px;
+            border: 2px solid var(--text-dark);
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .polaroid:hover {
+            transform: scale(1.05) rotate(-2deg);
+            z-index: 10;
+        }
+        .polaroid.selected {
+            border-color: var(--pink);
+            box-shadow: 0px 0px 15px var(--pink), 4px 4px 0px var(--pink);
+            transform: scale(1.02);
+        }
+        .polaroid.selected::after {
+            content: '💖';
+            position: absolute;
+            bottom: 4px;
+            right: 8px;
+            font-size: 1.2rem;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+        .scattered-photo {
+            position: absolute;
+            transition: all 1s ease-out;
+            pointer-events: none;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.15);
+        }
+        
+        .sticky-note {
+            background-color: var(--yellow);
+            color: var(--text-dark);
+            padding: clamp(20px, 5vw, 40px) clamp(15px, 4vw, 25px);
+            width: 90vw;
+            max-width: 480px; 
+            aspect-ratio: 4 / 3; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.15);
+            border: 2px solid var(--text-dark);
+            position: relative;
+            font-size: clamp(1rem, 4.5vw, 1.5rem); 
+            line-height: 1.8; 
+            overflow: hidden;
+        }
+        .sticky-tape {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 60px;
+            height: 25px;
+            background-color: rgba(255, 183, 213, 0.8); 
+            border: 1px solid var(--text-dark);
+        }
+        .floating-heart-particle {
+            position: absolute;
+            font-size: 2rem;
+            pointer-events: none;
+            animation: floatUp 3s ease-in forwards;
+            z-index: 50;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-20vh) scale(1.5) rotate(45deg); opacity: 0; }
+        }
+
+        .virus-popup {
+            position: absolute;
+            background-color: var(--window-bg);
+            border: 3px solid var(--text-dark);
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+            width: clamp(240px, 70vw, 320px);
+            z-index: 40;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .virus-header {
+            background-color: #ff4a4a; 
+            color: white;
+            border-bottom: 3px solid var(--text-dark);
+            padding: 4px 8px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+        }
+        .virus-body {
+            padding: clamp(12px, 3vw, 16px);
+            text-align: center;
+            font-size: clamp(1rem, 3.5vw, 1.2rem);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .virus-footer {
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background-color: rgba(0,0,0,0.05);
+            border-top: 2px solid var(--text-dark);
+            position: relative;
+        }
+        .btn-evade {
+            transition: transform 0.2s ease;
+            background-color: #d1d5db; 
+            color: var(--text-dark);
+        }
+        .pixel-sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--pink);
+            pointer-events: none;
+            border: 2px solid var(--text-dark);
+            animation: sparkleOut 0.6s ease-out forwards;
+            z-index: 100;
+        }
+        @keyframes sparkleOut {
+            0% { transform: scale(1) translate(0, 0) rotate(0deg); opacity: 1; }
+            100% { transform: scale(0) var(--translate-end) rotate(180deg); opacity: 0; }
+        }
+        .positive-toast {
+            background-color: var(--mint);
+            color: var(--text-dark);
+            border: 3px solid var(--text-dark);
+            padding: 12px 24px;
+            box-shadow: 4px 4px 0px var(--text-dark);
+            font-family: 'Pixelify Sans', sans-serif;
+            font-size: clamp(0.9rem, 4vw, 1.1rem);
+            animation: slideUpFade 3s ease-in-out forwards;
+            margin-bottom: 10px;
+            pointer-events: none;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(20px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        #screen-mission3 { inset: 0; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; }
+        #screen-mission3 > .absolute.top-8 { left: 0; right: 0; width: 100%; padding-inline: 12px; box-sizing: border-box; }
+        #m3-cards-container { inset: 0; width: 100%; height: 100%; overflow: hidden; }
+        
+        .bad-vibe-card {
+            position: absolute;
+            background-color: white;
+            border: 3px solid var(--text-dark);
+            padding: clamp(8px, 2vw, 12px) clamp(10px, 3vw, 16px);
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            text-align: center;
+            font-size: clamp(0.85rem, 3.5vw, 1.1rem);
+            max-width: min(85vw, 300px);
+            z-index: 20;
+            transition: transform 0.1s;
+        }
+        .bad-vibe-card:active { cursor: grabbing; transform: scale(1.05); }
+        .bad-vibe-card.sucked {
+            transform: scale(0.1) rotate(180deg) !important;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+        }
+        .trash-bin-wrapper {
+            position: absolute;
+            bottom: clamp(12px, 4vh, 30px);
+            left: 50%;
+            transform: translateX(-50%) scale(1.4); 
+            transform-origin: bottom center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+        .trash-lid {
+            width: 100px;
+            height: 20px;
+            background-color: #9CA3AF;
+            border: 4px solid var(--text-dark);
+            border-radius: 8px 8px 0 0;
+            margin-bottom: -4px;
+            transition: transform 0.2s ease-out;
+            transform-origin: right bottom;
+            position: relative;
+            z-index: 12;
+        }
+        .trash-lid::after {
+            content: '';
+            position: absolute;
+            top: -10px; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 10px;
+            background-color: #9CA3AF;
+            border: 4px solid var(--text-dark);
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+        }
+        .trash-lid.open {
+            transform: rotate(35deg) translateY(-10px) translateX(10px);
+        }
+        .trash-body {
+            width: 90px;
+            height: 110px;
+            background-color: #D1D5DB;
+            border: 4px solid var(--text-dark);
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            justify-content: space-evenly;
+            padding-top: 10px;
+            position: relative;
+            z-index: 11;
+        }
+        .trash-line {
+            width: 4px;
+            height: 80%;
+            background-color: #9CA3AF;
+        }
+        .delete-toast {
+            position: absolute;
+            color: #ef4444; 
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 2px 2px 0px white;
+            pointer-events: none;
+            animation: floatUpDelete 1s ease-out forwards;
+            z-index: 40;
+        }
+        @keyframes floatUpDelete {
+            0% { transform: translateY(0) scale(0.5); opacity: 1; }
+            50% { transform: translateY(-30px) scale(1.2); opacity: 1; }
+            100% { transform: translateY(-50px) scale(1); opacity: 0; }
+        }
+
+        .puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            width: 100%;
+            height: 100%;
+            gap: 2px;
+            background-color: var(--text-dark);
+            border: 4px solid var(--text-dark);
+            touch-action: none; 
+        }
+        .puzzle-tile {
+            background-color: white;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .folder-icon {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .folder-icon:hover {
+            transform: scale(1.1);
+        }
+        .flash-anim {
+            background-color: white;
+            animation: flashOut 1.5s ease-out forwards;
+            z-index: 50;
+        }
+        @keyframes flashOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; display: none; }
+        }
+
+        .printer-body {
+            background-color: #e5e7eb;
+            border: 4px solid var(--text-dark);
+            border-radius: 8px 8px 0 0; 
+            box-shadow: inset 0 -10px 0 rgba(0,0,0,0.1); 
+        }
+        .printer-slot {
+            background-color: #374151;
+            border: 2px solid var(--text-dark);
+            border-top: none; 
+            border-radius: 0 0 4px 4px;
+        }
+        .confetti-piece {
+            position: absolute;
+            top: -10vh;
+            width: 10px;
+            height: 10px;
+            animation: fallConfetti linear forwards;
+            z-index: 45;
+        }
+        @keyframes fallConfetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+        @media (max-width: 767px) {
+            #taskbar { flex-basis: 44px; height: 44px; padding: 0 8px; gap: 6px; }
+            #taskbar .mr-4 { margin-right: 4px; }
+            #taskbar .ml-auto { margin-left: 6px; }
+            #screen-mission3 > .absolute.top-8 { top: 12px; }
+        }
+        @media (max-height: 520px) { #taskbar { flex-basis: 38px; height: 38px; } #screen-mission3 > .absolute.top-8 { top: 6px; } }
+    </style>
+</head>
+<body>
+
+    <div id="os-container">
+        <!-- Desktop Area -->
+        <div id="desktop">
+            
+            <div id="screen-start" class="screen active">
+                <div class="pixel-window w-full max-w-[90%] sm:max-w-sm text-center p-6 flex flex-col items-center">
+                    <div class="mb-4 text-4xl">💻</div>
+                    <h1 class="text-2xl sm:text-3xl font-bold mb-2">CREAMMII OS v1.0</h1>
+                    <div class="text-2xl text-[var(--pink)] mb-2">♡</div>
+                    <p class="mb-6 text-base sm:text-lg">A Little World<br>Made For You</p>
+                    <button class="pixel-btn pixel-btn-mint w-full" onclick="app.goToScreen('screen-password')">[ START ]</button>
+                </div>
+            </div>
+
+            <div id="screen-password" class="screen">
+                <div class="pixel-window w-full max-w-[90%] sm:max-w-xs text-center p-6">
+                    <h2 class="text-xl sm:text-2xl font-bold mb-4">Enter Password</h2>
+                    <!-- Display digits -->
+                    <div id="password-display" class="text-3xl sm:text-4xl tracking-widest mb-2 font-bold h-12 flex justify-center gap-3 sm:gap-4 transition-all duration-300">
+                        <span id="pwd-char-0">_</span>
+                        <span id="pwd-char-1">_</span>
+                        <span id="pwd-char-2">_</span>
+                        <span id="pwd-char-3">_</span>
+                    </div>
+                    <p id="password-hint" class="text-xs sm:text-sm text-gray-500 mb-4 h-5 transition-colors">Hint: It's easier than you think ♡</p>
+                    <div class="keypad-grid">
+                        <button class="pixel-btn" id="btn-key-1" onclick="app.pressKey(1)">1</button>
+                        <button class="pixel-btn" id="btn-key-2" onclick="app.pressKey(2)">2</button>
+                        <button class="pixel-btn" id="btn-key-3" onclick="app.pressKey(3)">3</button>
+                        <button class="pixel-btn" id="btn-key-4" onclick="app.pressKey(4)">4</button>
+                        <button class="pixel-btn" id="btn-key-5" onclick="app.pressKey(5)">5</button>
+                        <button class="pixel-btn" id="btn-key-6" onclick="app.pressKey(6)">6</button>
+                        <button class="pixel-btn" id="btn-key-7" onclick="app.pressKey(7)">7</button>
+                        <button class="pixel-btn" id="btn-key-8" onclick="app.pressKey(8)">8</button>
+                        <button class="pixel-btn" id="btn-key-9" onclick="app.pressKey(9)">9</button>
+                        <button class="pixel-btn text-xs sm:text-sm" onclick="app.clearPassword()">CLR</button>
+                        <button class="pixel-btn" id="btn-key-0" onclick="app.pressKey(0)">0</button>
+                        <button class="pixel-btn text-xs sm:text-sm pixel-btn-pink" onclick="app.checkPassword()">OK</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="screen-boot" class="screen">
+                <div class="terminal-text text-xs sm:text-sm md:text-base flex flex-col">
+                    <div id="terminal-content"></div>
+                    <div class="blinking-cursor"></div>
+                </div>
+            </div>
+
+            <div id="screen-mission1" class="screen flex-col">
+                <div id="m1-main-content" class="w-full max-w-4xl p-4 flex flex-col items-center h-full overflow-y-auto pt-8">
+                    <div class="pixel-window p-3 sm:p-4 mb-4 sm:mb-6 text-center sticky top-0 z-20 w-[95%] max-w-md bg-[var(--window-bg)]">
+                        <h1 class="text-xl sm:text-2xl font-bold mb-1">MISSION #01</h1>
+                        <p class="text-xs sm:text-sm">Choose 5 memories ♡<br>Pick the pictures that make you smile.</p>
+                        <div id="m1-counter" class="mt-2 text-[var(--pink)] font-bold text-lg sm:text-xl tracking-wider">0 / 5 selected</div>
+                    </div>
+                    <div id="m1-grid" class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-6 pb-20 w-full px-2 sm:px-4"></div>
+                </div>
+                <div id="m1-story-overlay" class="absolute inset-0 z-30 pointer-events-none flex justify-center items-center opacity-0 transition-opacity duration-1000 bg-white/30 backdrop-blur-sm">
+                    <div id="m1-scatter-container" class="absolute inset-0 overflow-hidden"></div>
+                    <div id="m1-sticky-wrapper" class="hidden transform rotate-2 z-40">
+                        <div class="sticky-note font-handwriting relative">
+                            <div class="sticky-tape"></div>
+                            <div id="m1-sticky-text" class="w-full"></div>
+                            <button id="m1-next-btn" class="hidden absolute bottom-4 right-4 text-2xl text-[var(--pink)] hover:scale-110 transition-transform animate-bounce" onclick="app.nextM1Message()">▶</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="screen-mission2" class="screen">
+                <div id="m2-container" class="w-full h-full relative overflow-hidden"></div>
+                <div id="m2-toast-container" class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-50"></div>
+                <div id="m2-final-wrapper" class="hidden absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+                    <div id="m2-final-popup" class="pixel-window p-6 text-center max-w-sm w-[90%] bg-[var(--window-bg)] pointer-events-auto shadow-2xl">
+                        <div class="w-24 h-24 sm:w-32 sm:h-32 mx-auto bg-gray-200 border-2 border-[var(--text-dark)] mb-4 overflow-hidden polaroid p-2 transform rotate-2">
+                            <img src="https://placehold.co/200x200/B8E8D4/4D4668?text=Creammii" class="w-full h-full object-cover">
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-bold mb-2">HEY...</h2>
+                        <p class="font-handwriting text-base sm:text-lg mb-4">ถึงใครจะไม่ใจดีกับหนู..<br>ลองหันมาทางนี้นะ (⁠ㆁ⁠ω⁠ㆁ⁠)</p>
+                        <p class="font-handwriting text-base sm:text-lg mb-6">อย่างน้อยตรงนี้<br>มีคนกำลังคอยเชียร์หนูอยู่ ♡</p>
+                        <button class="pixel-btn pixel-btn-mint w-full" onclick="app.finishMission2()">[ ♡ รับทราบแล้ว ]</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="screen-mission3" class="screen w-full h-full bg-[var(--primary-bg)]">
+                <div class="absolute top-8 text-center w-full z-10 pointer-events-none px-4">
+                    <h1 class="text-xl sm:text-2xl font-bold mb-1">MISSION #03</h1>
+                    <p class="text-xs sm:text-sm text-gray-600">Delete the Bad Vibes...</p>
+                    <div id="m3-counter" class="mt-2 text-[var(--pink)] font-bold text-lg sm:text-xl"></div>
+                </div>
+                <div id="m3-cards-container" class="absolute inset-0 w-full h-full"></div>
+                <div class="trash-bin-wrapper" id="m3-trash-wrapper">
+                    <div class="trash-lid" id="m3-trash-lid"></div>
+                    <div class="trash-body" id="m3-trash-body">
+                        <div class="trash-line"></div>
+                        <div class="trash-line"></div>
+                        <div class="trash-line"></div>
+                        <div class="trash-line"></div>
+                    </div>
+                </div>
+                <div id="m3-final-wrapper" class="hidden absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+                    <div id="m3-final-popup" class="pixel-window p-4 sm:p-6 text-center max-w-sm w-[90%] bg-[var(--window-bg)] pointer-events-auto shadow-2xl">
+                        <h2 class="text-lg sm:text-xl font-bold mb-2">SYSTEM MESSAGE</h2>
+                        <p class="font-handwriting text-base sm:text-lg mb-4 text-[var(--text-dark)] leading-relaxed">
+                            ถึงใครจะไม่ใจดีกับหนู...<br>พี่อยากให้หนูใจดีกับตัวเองมากๆ<br><br>
+                            เพราะหนูต้องอยู่กับตัวเอง<br>ไปอีกนานมากแสนนาน ♡<br><br>
+                            ลองหันมาทางนี้สิ<br>ก็ยังมีพี่สแตนบายอยู่นี่อีกคน
+                        </p>
+                        <div class="flex items-center justify-center gap-4 mt-4">
+                            <span class="text-sm animate-bounce">กดตรงนี้... 👉</span>
+                            <button class="text-4xl sm:text-5xl hover:scale-110 transition-transform drop-shadow-md animate-pulse" onclick="app.finishMission3()">💖</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="screen-mission4" class="screen flex-col bg-[var(--blue)] overflow-hidden">
+                <div id="m4-desktop-view" class="absolute inset-0 w-full h-full flex items-center justify-center transition-opacity duration-300 z-10">
+                    <div class="flex flex-col items-center folder-icon" ondblclick="app.openM4Folder()" onclick="app.openM4Folder()">
+                        <div class="text-7xl sm:text-8xl drop-shadow-md pointer-events-none transform hover:scale-110 transition-transform">📁</div>
+                        <div class="mt-2 font-bold bg-[var(--window-bg)] px-2 border-2 border-[var(--text-dark)] text-sm whitespace-nowrap pointer-events-none shadow-md">♡ OUR MEMORIES</div>
+                        <div class="text-xs mt-2 animate-bounce text-gray-700 font-bold bg-white/50 px-2 rounded-full">(Tap / Double Click)</div>
+                    </div>
+                </div>
+                <div id="m4-viewer-window" class="hidden absolute z-20 w-[95%] max-w-md transition-all duration-500 scale-90 opacity-0 flex flex-col items-center justify-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <div class="pixel-window w-full bg-[var(--window-bg)] shadow-2xl">
+                        <div class="pixel-window-header bg-[var(--pink)] flex justify-between items-center">
+                            <span class="text-xs sm:text-sm md:text-base">Creammii Photo Viewer</span>
+                            <span class="font-bold opacity-50 text-sm">_ □ x</span>
+                        </div>
+                        <div class="p-3 sm:p-4 flex flex-col items-center relative">
+                            <div class="w-full aspect-square max-w-[280px] sm:max-w-[320px] relative mb-2">
+                                <div id="m4-puzzle-grid" class="puzzle-grid"></div>
+                                <img id="m4-final-img" src="" class="hidden w-full h-full object-cover border-4 border-[var(--text-dark)] shadow-md">
+                                <div id="m4-flash" class="absolute inset-0 pointer-events-none opacity-0 z-20"></div>
+                            </div>
+                            <div class="mt-2 sm:mt-4 min-h-[70px] sm:min-h-[90px] w-full text-center flex flex-col items-center justify-center">
+                                <p id="m4-message-container" class="font-handwriting text-sm sm:text-base md:text-lg leading-relaxed text-[var(--text-dark)]"></p>
+                                <button id="m4-next-btn" class="hidden mt-2 text-3xl sm:text-4xl hover:scale-110 transition-transform drop-shadow-md animate-bounce mx-auto" onclick="app.finishMission4()">💖</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="screen-mission5" class="screen bg-[var(--primary-bg)] overflow-hidden">
+                
+                <!-- Floating GIF Side Elements -->
+                <div class="absolute left-1 sm:left-4 md:left-10 top-1/2 transform -translate-y-1/2 w-[80px] sm:w-[120px] md:w-[150px] z-50 drop-shadow-md bg-white p-1 sm:p-2 border-2 border-[var(--text-dark)] rounded-md">
+                    <img src="https://media1.tenor.com/m/s7lGkoIAieYAAAAC/so-cute-cat.gif" crossorigin="anonymous" class="w-full h-auto object-contain">
+                </div>
+                
+                <!-- GIF ด้านขวา -->
+                <div class="absolute right-1 sm:right-4 md:right-10 top-1/2 transform -translate-y-1/2 w-[80px] sm:w-[120px] md:w-[150px] z-50 drop-shadow-md bg-white p-1 sm:p-2 border-2 border-[var(--text-dark)] rounded-md">
+                    <img src="https://media1.tenor.com/m/s7lGkoIAieYAAAAC/so-cute-cat.gif" crossorigin="anonymous" class="w-full h-auto object-contain">
+                </div>
+
+                <div id="m5-tap-hint" class="absolute top-[100px] sm:top-[130px] w-full text-center text-xs sm:text-sm font-bold text-gray-600 animate-bounce z-10">Tap the printer to start!</div>
+                
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 flex flex-col items-center w-[85%] sm:w-[90%] max-w-[280px] sm:max-w-[320px] h-full pointer-events-none">
+                    
+                    <div id="m5-printer-machine" class="w-full relative z-20 cursor-pointer hover:scale-105 transition-transform pointer-events-auto" onclick="app.startPrinting()">
+                        <div id="m5-printer-body" class="printer-body w-full h-20 sm:h-24 flex items-center justify-between p-3 sm:p-4 relative z-20">
+                            <div class="font-bold text-base sm:text-lg text-gray-700 tracking-widest">PRINT_BOY</div>
+                            <div class="flex gap-2 items-center">
+                                <div class="w-6 sm:w-8 h-2 sm:h-3 bg-gray-400 rounded-sm border border-gray-600"></div>
+                                <div id="printer-led" class="w-2 sm:w-3 h-2 sm:h-3 rounded-full bg-red-400 border border-gray-600 shadow-[0_0_5px_rgba(0,0,0,0.2)] transition-colors duration-300"></div>
+                            </div>
+                        </div>
+                        <div class="absolute -bottom-2 sm:-bottom-3 left-1/2 transform -translate-x-1/2 w-[90%] h-3 sm:h-4 printer-slot z-30"></div>
+                    </div>
+
+                    <div id="m5-receipt-mask" class="w-[85%] relative z-10 mx-auto -mt-2 overflow-hidden pointer-events-auto" style="height: 0px; transition: height 3s linear;">
+                        
+                        <div id="m5-receipt-paper" class="absolute bottom-0 w-full bg-white border-2 border-t-0 border-[var(--text-dark)] shadow-[0_10px_20px_rgba(0,0,0,0.1)] pb-[10px]">
+                            
+                            <div class="w-full flex flex-col items-center p-3 sm:p-4 pb-5 sm:pb-6 text-xs sm:text-sm font-pixelify text-gray-800">
+                                <div class="text-center border-b-2 border-dashed border-gray-400 pb-2 mb-3 sm:mb-4 w-full">
+                                    <h2 class="text-lg sm:text-xl font-bold">CREAMMII OS</h2>
+                                    <p class="text-[10px] sm:text-xs text-gray-500">Memory Print Service</p>
+                                    <p id="receipt-date" class="text-[10px] sm:text-xs mt-1"></p>
+                                </div>
+
+                                <div class="my-2 sm:my-4 text-3xl sm:text-4xl animate-bounce flex items-center gap-2">🎂 ✨</div>
+                                
+                                <div class="font-handwriting text-sm sm:text-base leading-relaxed text-left w-full mt-2">
+                                    สุขสันต์วันเกิดนะเจ้าเด็ก 🎂<br><br>
+                                    ขอให้โลกนี้ใจดีกับหนูเยอะๆ<br>
+                                    ขอให้มีรอยยิ้มขึ้นในทุกวัน<br>
+                                    และจำไว้.. ไม่ว่าจะเจออะไร<br>
+                                    พี่จะอยู่ตรงนี้เสมอ ♡<br><br>
+                                    รักนะ เจ้าเด็กขี้แย✨
+                                </div>
+                                
+                                <div class="text-center border-t-2 border-dashed border-gray-400 pt-2 mt-4 sm:mt-6 w-full text-[10px] sm:text-xs text-gray-500">
+                                    *** END OF MESSAGE ***<br>Hope U have a nice Life ♡
+                                </div>
+                            </div>
+
+                            <div class="absolute bottom-0 left-0 w-full h-2 z-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSI4Ij48cGF0aCBkPSJNMCA4bTUtOCBsNSA4IGw1LTggbDUgOHYtOGgtMjB6IiBmaWxsPSIjRkZGOEVFIi8+PC9zdmc+')]"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- ปุ่ม Save Image -->
+                    <button id="m5-save-btn" class="hidden mt-4 sm:mt-6 pixel-btn pixel-btn-purple pointer-events-auto shadow-xl z-50 animate-[popIn_0.5s_ease-out_forwards]" onclick="app.saveMemory()">
+                        📸 SAVE MEMORY
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="taskbar">
+            <div class="font-bold flex items-center gap-1 sm:gap-2 mr-2 sm:mr-4 text-xs sm:text-base">
+                <span class="text-[var(--pink)]">♡</span> <span class="hidden sm:inline">Creammii OS</span><span class="sm:hidden">OS</span>
+            </div>
+            <div class="flex-grow flex gap-1 sm:gap-2 overflow-x-auto no-scrollbar">
+                <div class="taskbar-item whitespace-nowrap" id="task-m1">[ M1 ]</div>
+                <div class="taskbar-item whitespace-nowrap" id="task-m2">[ M2 ]</div>
+                <div class="taskbar-item whitespace-nowrap" id="task-m3">[ M3 ]</div>
+                <div class="taskbar-item whitespace-nowrap" id="task-m4">[ M4 ]</div>
+                <div class="taskbar-item whitespace-nowrap" id="task-m5">[ M5 ]</div>
+            </div>
+            <div id="os-time" class="text-xs sm:text-sm font-bold ml-auto pl-2">00:00</div>
+        </div>
+    </div>
+
+    <script>
+        const app = {
+            currentPassword: "",
+            correctPassword: "1010",
+            isBooting: false, 
+            
+            init() {
+                this.updateTime();
+                setInterval(() => this.updateTime(), 1000);
+                
+                if(!localStorage.getItem('creammiiProgress')) {
+                    localStorage.setItem('creammiiProgress', JSON.stringify({
+                        currentMission: 0,
+                        selectedMemories: [],
+                        completedMissions: []
+                    }));
+                }
+                
+                window.addEventListener('keydown', (e) => this.handleKeyboard(e));
+                window.addEventListener('resize', () => this.clampM3CardsToViewport());
+                window.addEventListener('orientationchange', () => setTimeout(() => this.clampM3CardsToViewport(), 250));
+            },
+
+            handleKeyboard(e) {
+                if (!document.getElementById('screen-password').classList.contains('active')) return;
+                if (this.isBooting) return;
+
+                if (e.key >= '0' && e.key <= '9') {
+                    this.pressKey(Number(e.key));
+                    this.simulateKeyPress(e.key); 
+                } else if (e.key === 'Backspace') {
+                    if (this.currentPassword.length > 0) {
+                        this.currentPassword = this.currentPassword.slice(0, -1);
+                        this.updatePasswordDisplay();
+                        document.getElementById('password-hint').textContent = "Hint: It's easier than you think ♡";
+                        document.getElementById('password-hint').classList.remove('text-red-500');
+                    }
+                } else if (e.key === 'Escape' || e.key.toLowerCase() === 'c') {
+                    this.clearPassword();
+                } else if (e.key === 'Enter') {
+                    if (this.currentPassword.length === 4) {
+                        this.checkPassword();
+                    }
+                }
+            },
+
+            simulateKeyPress(key) {
+                const btn = document.getElementById(`btn-key-${key}`);
+                if (btn) {
+                    btn.classList.add('active-key');
+                    setTimeout(() => btn.classList.remove('active-key'), 100);
+                }
+            },
+
+            updateTime() {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                document.getElementById('os-time').textContent = timeStr;
+            },
+
+            goToScreen(screenId) {
+                document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+                document.getElementById(screenId).classList.add('active');
+            },
+
+            pressKey(num) {
+                if (this.currentPassword.length < 4) {
+                    this.currentPassword += num;
+                    this.updatePasswordDisplay();
+                }
+                if (this.currentPassword.length === 4) {
+                    setTimeout(() => this.checkPassword(), 200);
+                }
+            },
+
+            clearPassword() {
+                this.currentPassword = "";
+                this.updatePasswordDisplay();
+                document.getElementById('password-hint').textContent = "Hint: It's easier than you think ♡";
+                document.getElementById('password-hint').classList.remove('text-red-500');
+            },
+
+            updatePasswordDisplay() {
+                for (let i = 0; i < 4; i++) {
+                    const charSpan = document.getElementById(`pwd-char-${i}`);
+                    
+                    if (i < this.currentPassword.length) {
+                        const inputChar = this.currentPassword[i];
+                        const correctChar = this.correctPassword[i];
+                        charSpan.textContent = inputChar;
+                        
+                        if (inputChar === correctChar) {
+                            charSpan.classList.add('text-[var(--purple)]', 'scale-125');
+                            charSpan.classList.remove('text-[var(--text-dark)]');
+                        } else {
+                            charSpan.classList.remove('text-[var(--purple)]', 'scale-125');
+                            charSpan.classList.add('text-[var(--text-dark)]');
+                        }
+                    } else {
+                        charSpan.textContent = "_";
+                        charSpan.classList.remove('text-[var(--purple)]', 'scale-125', 'text-[var(--pink)]');
+                        charSpan.classList.add('text-[var(--text-dark)]');
+                    }
+                }
+            },
+
+            checkPassword() {
+                if (this.isBooting) return; 
+
+                if (this.currentPassword === this.correctPassword) {
+                    this.isBooting = true; 
+                    
+                    for (let i = 0; i < 4; i++) {
+                        const charSpan = document.getElementById(`pwd-char-${i}`);
+                        charSpan.classList.remove('text-[var(--purple)]');
+                        charSpan.classList.add('text-[var(--pink)]', 'scale-125');
+                    }
+
+                    document.getElementById('password-hint').textContent = "Welcome NAA ♡";
+                    
+                    setTimeout(() => {
+                        this.startBootSequence();
+                    }, 800);
+                } else {
+                    const windowEl = document.querySelector('#screen-password .pixel-window');
+                    windowEl.classList.add('shake');
+                    document.getElementById('password-hint').textContent = "Oops! Try again, little human ♡";
+                    document.getElementById('password-hint').classList.add('text-red-500');
+                    
+                    setTimeout(() => {
+                        windowEl.classList.remove('shake');
+                        this.clearPassword();
+                    }, 500);
+                }
+            },
+
+            startBootSequence() {
+                this.goToScreen('screen-boot');
+                const content = document.getElementById('terminal-content');
+                content.innerHTML = "";
+                
+                const lines = [
+                    { text: "Creammii OS starting...", delay: 400 },
+                    { text: "Loading Core Modules... [OK]", delay: 500 },
+                    { text: "Checking memory sectors...", delay: 600 },
+                    { text: "Scanning for negative thoughts...", delay: 800 },
+                    { text: "WARNING: Found some vulnerabilities...", delay: 800, color: "#FFE69A" },
+                    { text: "Don't worry. We're handling them together ♡", delay: 1200, color: "var(--pink)" },
+                    { text: "Installing tiny happiness patch...", delay: 400 },
+                    { isProgress: true, delay: 800 }, 
+                    { text: "Update Successful.", delay: 500, color: "var(--mint)" },
+                    { text: "Welcome JAA, Creammii ♡", delay: 1500, color: "var(--lavender)" }
+                ];
+
+                let currentLine = 0;
+
+                const typeLine = () => {
+                    if (currentLine < lines.length) {
+                        const lineData = lines[currentLine];
+                        const div = document.createElement('div');
+                        div.style.marginBottom = "8px";
+                        if(lineData.color) div.style.color = lineData.color;
+                        content.appendChild(div);
+
+                        const terminalWrapper = document.querySelector('.terminal-text');
+
+                        if (lineData.isProgress) {
+                            let progress = 0;
+                            const updateProgress = () => {
+                                progress += Math.floor(Math.random() * 15) + 5; 
+                                if (progress > 100) progress = 100;
+                                
+                                let filled = Math.floor(progress / 5);
+                                let empty = 20 - filled;
+                                div.textContent = "[" + "█".repeat(filled) + "░".repeat(empty) + `] ${progress}%`;
+                                terminalWrapper.scrollTop = terminalWrapper.scrollHeight;
+                                
+                                if (progress < 100) {
+                                    setTimeout(updateProgress, Math.random() * 200 + 50); 
+                                } else {
+                                    currentLine++;
+                                    setTimeout(typeLine, lineData.delay);
+                                }
+                            };
+                            updateProgress();
+                        } else {
+                            let charIndex = 0;
+                            const typeChar = () => {
+                                if (charIndex < lineData.text.length) {
+                                    div.textContent += lineData.text.charAt(charIndex);
+                                    charIndex++;
+                                    terminalWrapper.scrollTop = terminalWrapper.scrollHeight; 
+                                    setTimeout(typeChar, 20); 
+                                } else {
+                                    currentLine++;
+                                    setTimeout(typeLine, lineData.delay);
+                                }
+                            };
+                            typeChar();
+                        }
+                    } else {
+                        setTimeout(() => {
+                            app.startMission1();
+                        }, 1000);
+                    }
+                };
+                typeLine();
+            },
+
+            m1Photos: [], 
+            m1SelectedCount: 0,
+            m1Completed: false, 
+            
+            startMission1() {
+                this.goToScreen('screen-mission1');
+                document.getElementById('task-m1').classList.add('active');
+                document.getElementById('task-m1').textContent = "✓ M1";
+                
+                this.m1Completed = false; 
+                
+                const selectedImages = [
+                    "https://i.postimg.cc/sGjfSw1J/LINE-ALBUM-10102026-261010-1.jpg",
+                    "https://i.postimg.cc/gLzcRNrs/LINE-ALBUM-10102026-261010-3.jpg",
+                    "https://i.postimg.cc/m1LZM8h8/LINE-ALBUM-10102026-261010-5.jpg",
+                    "https://i.postimg.cc/q6JBnjgm/LINE-ALBUM-10102026-261010-7.jpg",
+                    "https://i.postimg.cc/D4vfsBmY/LINE-ALBUM-10102026-261010-9.jpg",
+                    "https://i.postimg.cc/1VmR6J4k/LINE-ALBUM-10102026-261010-11.jpg",
+                    "https://i.postimg.cc/Lg94fNnM/LINE-ALBUM-10102026-261010-13.jpg",
+                    "https://i.postimg.cc/bSyYb3s8/LINE-ALBUM-10102026-261010-15.jpg",
+                    "https://i.postimg.cc/Rq4ZjVG6/LINE-ALBUM-10102026-261010-17.jpg",
+                    "https://i.postimg.cc/s1sgtDKZ/LINE-ALBUM-10102026-261010-19.jpg"
+                ];
+
+                this.m1Photos = selectedImages.map((imgUrl, i) => ({
+                    id: i,
+                    url: imgUrl,
+                    selected: false
+                }));
+
+                this.m1SelectedCount = 0;
+                this.updateM1Counter();
+
+                const grid = document.getElementById('m1-grid');
+                grid.innerHTML = '';
+
+                this.m1Photos.forEach((photo) => {
+                    const div = document.createElement('div');
+                    div.className = 'polaroid flex flex-col pointer-events-auto';
+                    div.id = `m1-photo-${photo.id}`;
+                    div.onclick = () => this.toggleMemorySelection(photo.id);
+                    
+                    div.innerHTML = `
+                        <div class="w-full aspect-square bg-gray-200 border border-gray-300 overflow-hidden">
+                            <img src="${photo.url}" alt="Memory ${photo.id}" class="w-full h-full object-cover pointer-events-none">
+                        </div>
+                    `;
+                    grid.appendChild(div);
+                });
+            },
+
+            toggleMemorySelection(id) {
+                if (this.m1Completed) return; 
+
+                const photo = this.m1Photos.find(p => p.id === id);
+                const el = document.getElementById(`m1-photo-${id}`);
+
+                if (!photo.selected && this.m1SelectedCount >= 5) {
+                    const counter = document.getElementById('m1-counter');
+                    counter.classList.remove('shake');
+                    void counter.offsetWidth; 
+                    counter.classList.add('shake');
+                    return;
+                }
+
+                photo.selected = !photo.selected;
+                
+                if (photo.selected) {
+                    el.classList.add('selected');
+                    this.m1SelectedCount++;
+                } else {
+                    el.classList.remove('selected');
+                    this.m1SelectedCount--;
+                }
+
+                this.updateM1Counter();
+
+                if (this.m1SelectedCount === 5 && !this.m1Completed) {
+                    this.m1Completed = true; 
+                    setTimeout(() => this.completeMission1(), 500);
+                }
+            },
+
+            updateM1Counter() {
+                const counter = document.getElementById('m1-counter');
+                counter.textContent = `${this.m1SelectedCount} / 5 selected`;
+                if(this.m1SelectedCount === 5) {
+                    counter.textContent = "Memory saved successfully ♡";
+                }
+            },
+
+            completeMission1() {
+                let progress = JSON.parse(localStorage.getItem('creammiiProgress') || '{}');
+                progress.selectedMemories = this.m1Photos.filter(p => p.selected).map(p => p.url);
+                progress.currentMission = 2;
+                localStorage.setItem('creammiiProgress', JSON.stringify(progress));
+
+                const overlay = document.getElementById('m1-story-overlay');
+                const scatterContainer = document.getElementById('m1-scatter-container');
+                const mainContent = document.getElementById('m1-main-content');
+                
+                scatterContainer.innerHTML = ''; 
+                mainContent.style.pointerEvents = 'none';
+                mainContent.style.filter = 'blur(3px)';
+                overlay.style.opacity = '1';
+                overlay.classList.remove('pointer-events-none');
+                overlay.classList.add('pointer-events-auto'); 
+
+                const unselected = this.m1Photos.filter(p => !p.selected);
+                unselected.forEach((photo, index) => {
+                    setTimeout(() => {
+                        const imgEl = document.createElement('div');
+                        imgEl.className = 'polaroid scattered-photo';
+                        
+                        let randomTop, randomLeft;
+                        const zone = index % 5;
+                        if (zone === 0) { randomTop = Math.random() * 10 + 5; randomLeft = Math.random() * 10 + 5; }
+                        else if (zone === 1) { randomTop = Math.random() * 10 + 5; randomLeft = Math.random() * 10 + 65; }
+                        else if (zone === 2) { randomTop = Math.random() * 15 + 60; randomLeft = Math.random() * 10 + 5; }
+                        else if (zone === 3) { randomTop = Math.random() * 15 + 60; randomLeft = Math.random() * 10 + 65; }
+                        else { randomTop = Math.random() * 5 + 2; randomLeft = Math.random() * 20 + 40; }
+                        
+                        const randomRot = (Math.random() - 0.5) * 50; 
+                        imgEl.style.top = `${randomTop}%`;
+                        imgEl.style.left = `${randomLeft}%`;
+                        imgEl.style.transform = `rotate(${randomRot}deg) scale(0.85)`;
+                        
+                        imgEl.innerHTML = `<img src="${photo.url}" class="w-16 h-16 sm:w-24 sm:h-24 object-cover">`;
+                        scatterContainer.appendChild(imgEl);
+                    }, index * 200); 
+                });
+
+                setTimeout(() => {
+                    const stickyWrapper = document.getElementById('m1-sticky-wrapper');
+                    stickyWrapper.classList.remove('hidden');
+                    stickyWrapper.classList.add('animate-[popIn_0.5s_ease-out_forwards]');
+                    this.playM1Story();
+                }, unselected.length * 200 + 1000);
+            },
+
+            m1Messages: [
+                "ถึงรูปพวกนี้จะไม่ได้ถูกเลือก\nในครั้งนี้\nเพราะอาจมีเหตุผลของมัน\nแต่มันไม่ได้แปลว่ารูปพวกนี้\nไม่มีความหมายใช่มั้ย",
+                "ก็เหมือนกับตัวเรา...\nที่บางครั้งเราอาจรู้สึก\nว่า'ถูกมองข้าม'\nหรือ 'ไม่สำคัญ'",
+                "แต่การที่ใครบางคนมองไม่เห็น\nคุณค่าของเรา\nไม่ได้แปลว่าเรา..\nมีคุณค่าน้อยลงนะ \nเข้าใจมั้ยเจ้าเด็ก ♡",
+                "ตรงนี้ยังมีคนที่มองเห็น\nคุณค่าของหนูอยู่ 😊"
+            ],
+            m1CurrentMsgIndex: 0,
+            m1IsTyping: false,
+
+            playM1Story() {
+                this.m1CurrentMsgIndex = 0;
+                this.typeM1Message();
+            },
+
+            typeM1Message() {
+                const textEl = document.getElementById('m1-sticky-text');
+                const nextBtn = document.getElementById('m1-next-btn');
+                
+                nextBtn.classList.add('hidden'); 
+                textEl.innerHTML = '';
+                this.m1IsTyping = true;
+                
+                if (this.m1CurrentMsgIndex >= this.m1Messages.length) {
+                    this.triggerHeartTransitionAndGoToM2();
+                    return;
+                }
+
+                const lines = this.m1Messages[this.m1CurrentMsgIndex].split('\n');
+                let lineIndex = 0;
+                let charIndex = 0;
+
+                const typeChar = () => {
+                    if (lineIndex < lines.length) {
+                        if (charIndex === 0 && lineIndex > 0) {
+                            textEl.appendChild(document.createElement('br'));
+                        }
+                        
+                        if (charIndex < lines[lineIndex].length) {
+                            textEl.innerHTML += lines[lineIndex].charAt(charIndex);
+                            charIndex++;
+                            setTimeout(typeChar, 40); 
+                        } else {
+                            lineIndex++;
+                            charIndex = 0;
+                            setTimeout(typeChar, 300); 
+                        }
+                    } else {
+                        this.m1IsTyping = false;
+                        nextBtn.classList.remove('hidden'); 
+                    }
+                };
+                typeChar();
+            },
+
+            nextM1Message() {
+                if (this.m1IsTyping) return; 
+                this.m1CurrentMsgIndex++;
+                this.typeM1Message();
+            },
+
+            triggerHeartTransitionAndGoToM2() {
+                const container = document.getElementById('os-container');
+                const colors = ['#FFB7D5', '#C8B6FF', '#B9D9FF', '#B8E8D4', '#FFE69A'];
+                
+                const stickyWrapper = document.getElementById('m1-sticky-wrapper');
+                stickyWrapper.classList.add('opacity-0');
+                stickyWrapper.style.transition = "opacity 0.5s ease";
+
+                const overlay = document.getElementById('m1-story-overlay');
+                overlay.classList.remove('pointer-events-auto');
+                overlay.classList.add('pointer-events-none');
+                
+                for(let i=0; i<40; i++) {
+                    setTimeout(() => {
+                        const heart = document.createElement('div');
+                        heart.className = 'floating-heart-particle font-pixelify';
+                        heart.textContent = '♡';
+                        heart.style.left = `${Math.random() * 100}vw`;
+                        heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+                        heart.style.animationDuration = `${2 + Math.random() * 2}s`;
+                        heart.style.fontSize = `${1.5 + Math.random() * 2}rem`; 
+                        container.appendChild(heart);
+                        
+                        setTimeout(() => heart.remove(), 4000);
+                    }, i * 60); 
+                }
+
+                setTimeout(() => {
+                    this.goToScreen('screen-mission2');
+                    this.startMission2();
+                }, 2500);
+            },
+
+            m2Thoughts: [
+                "ฉันไม่เก่งเหมือนคนอื่น",
+                "ฉันไม่ดีเท่าคนอื่น",
+                "ฉันยังไม่ดีพอ",
+                "ทุกคนเก่งกว่าฉัน",
+                "ฉันทำอะไรก็ไม่ดี",
+                "ฉันคิดมากเกินไปอีกแล้ว"
+            ],
+            m2PositiveMessages: [
+                "หนูไม่จำเป็นต้องเก่งเหมือนใครเลย ♡",
+                "การค่อย ๆ เติบโตก็ถือว่าเติบโตนะ",
+                "หนูทำดีที่สุดเท่าที่ทำได้แล้วในตอนนั้น",
+                "หนูไม่จำเป็นต้องสมบูรณ์แบบเพื่อให้เป็นที่รัก",
+                "หนูมีคุณค่า แม้ในวันที่ตัวเองมองไม่เห็นมัน",
+                "พี่เห็นความตั้งใจของหนูนะ",
+                "ร้องไห้ได้ พักได้ แล้วค่อยไปต่อก็ได้",
+                "พี่ภูมิใจในความพยายามของหนูนะ"
+            ],
+            m2ActivePopups: 0,
+            
+            startMission2() {
+                document.getElementById('task-m2').classList.add('active');
+                document.getElementById('task-m2').textContent = "✓ M2";
+                
+                const container = document.getElementById('m2-container');
+                container.innerHTML = ''; 
+                this.m2ActivePopups = this.m2Thoughts.length;
+
+                this.m2Thoughts.forEach((thought, index) => {
+                    setTimeout(() => {
+                        this.spawnNegativePopup(thought, index);
+                    }, index * 800 + 1000); 
+                });
+            },
+
+            spawnNegativePopup(text, id) {
+                const container = document.getElementById('m2-container');
+                const popup = document.createElement('div');
+                popup.className = 'virus-popup';
+                popup.id = `m2-popup-${id}`;
+                
+                const maxX = window.innerWidth > 400 ? window.innerWidth - 350 : window.innerWidth - 280;
+                const maxY = window.innerHeight - 250;
+                
+                const randomX = Math.max(10, Math.random() * maxX); 
+                const randomY = Math.max(10, Math.random() * maxY);
+                
+                popup.style.left = `${randomX}px`;
+                popup.style.top = `${randomY}px`;
+
+                popup.innerHTML = `
+                    <div class="virus-header">
+                        <span>⚠</span> Negative Thought
+                    </div>
+                    <div class="virus-body font-handwriting">
+                        ${text}
+                    </div>
+                    <div class="virus-footer">
+                        <button class="pixel-btn btn-evade text-xs sm:text-sm" 
+                                onmouseenter="app.evadeCursor(this)"
+                                onclick="app.evadeCursor(this); event.preventDefault();" 
+                                ontouchstart="app.evadeCursor(this); event.preventDefault();">
+                            [ ใช่แล้วล่ะ.. ]
+                        </button>
+                        <button class="pixel-btn pixel-btn-pink text-xs sm:text-sm" 
+                                onclick="app.closeNegativePopup(${id}, this)">
+                            [ ไม่ใช่สักหน่อย!! ]
+                        </button>
+                    </div>
+                `;
+                container.appendChild(popup);
+            },
+
+            evadeCursor(btn) {
+                let currentX = parseFloat(btn.dataset.tx || 0);
+                let currentY = parseFloat(btn.dataset.ty || 0);
+                const jumpX = (Math.random() * 100 + 50) * (Math.random() > 0.5 ? 1 : -1);
+                const jumpY = (Math.random() * 80 + 40) * (Math.random() > 0.5 ? 1 : -1);
+                const newX = currentX + jumpX;
+                const newY = currentY + jumpY;
+                btn.dataset.tx = newX;
+                btn.dataset.ty = newY;
+                btn.style.position = 'relative'; 
+                btn.style.zIndex = '100'; 
+                btn.style.transition = 'transform 0.05s ease-out'; 
+                btn.style.transform = `translate(${newX}px, ${newY}px)`;
+            },
+
+            closeNegativePopup(id, btnElement) {
+                const popup = document.getElementById(`m2-popup-${id}`);
+                if (!popup) return;
+                const rect = popup.getBoundingClientRect();
+                this.createSparkles(rect.left + rect.width/2, rect.top + rect.height/2);
+                popup.remove();
+                this.m2ActivePopups--;
+                this.showPositiveMessage();
+                if (this.m2ActivePopups <= 0) {
+                    setTimeout(() => { this.showFinalM2Popup(); }, 1500);
+                }
+            },
+
+            createSparkles(x, y) {
+                const container = document.getElementById('screen-mission2');
+                const colors = ['#FFB7D5', '#FFE69A', '#B8E8D4', '#C8B6FF'];
+                for(let i = 0; i < 12; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'pixel-sparkle';
+                    sparkle.style.left = `${x}px`;
+                    sparkle.style.top = `${y}px`;
+                    sparkle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = Math.random() * 60 + 30;
+                    const tx = Math.cos(angle) * distance;
+                    const ty = Math.sin(angle) * distance;
+                    sparkle.style.setProperty('--translate-end', `translate(${tx}px, ${ty}px)`);
+                    container.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 600);
+                }
+            },
+
+            showPositiveMessage() {
+                const container = document.getElementById('m2-toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'positive-toast';
+                const randomMsg = this.m2PositiveMessages[Math.floor(Math.random() * this.m2PositiveMessages.length)];
+                toast.innerHTML = `✨ ${randomMsg} ✨`;
+                container.appendChild(toast);
+                setTimeout(() => { toast.remove(); }, 3000);
+            },
+
+            showFinalM2Popup() {
+                const wrapper = document.getElementById('m2-final-wrapper');
+                const finalPopup = document.getElementById('m2-final-popup');
+                wrapper.classList.remove('hidden');
+                finalPopup.classList.add('animate-[popIn_0.5s_ease-out_forwards]');
+            },
+
+            finishMission2() {
+                let progress = JSON.parse(localStorage.getItem('creammiiProgress') || '{}');
+                progress.currentMission = 3;
+                localStorage.setItem('creammiiProgress', JSON.stringify(progress));
+                this.goToScreen('screen-mission3');
+                this.startMission3();
+            },
+
+            m3ThoughtsList: [
+                "ฉันไม่เก่งเหมือนคนอื่น",
+                "ฉันไม่ประสบความสำเร็จ",
+                "ฉันไม่ดีเท่าคนอื่น",
+                "ฉันไม่น่ารัก",
+                "ฉันไม่เคยทำให้ใครภูมิใจ",
+                "ฉันไม่ภูมิใจในตัวเองเลย",
+                "ฉันยังไม่ดีพอ",
+                "ทำไมไม่มีใครรักฉัน",
+                "ทุกคนเก่งกว่าฉันหมดเลย",
+                "ฉันเป็นภาระหรือเปล่า"
+            ],
+            m3Remaining: 0,
+            m3DraggedCard: null,
+
+            startMission3() {
+                document.getElementById('task-m3').classList.add('active');
+                document.getElementById('task-m3').textContent = "✓ M3";
+                this.m3Remaining = this.m3ThoughtsList.length;
+                this.updateM3Counter();
+                const container = document.getElementById('m3-cards-container');
+                container.innerHTML = '';
+                
+                this.m3ThoughtsList.forEach((text, i) => {
+                    setTimeout(() => {
+                        if (!container.isConnected || !document.getElementById('screen-mission3').classList.contains('active')) return;
+                        const card = document.createElement('div');
+                        card.className = 'bad-vibe-card font-handwriting text-[var(--text-dark)]';
+                        card.textContent = text;
+                        card.style.opacity = '0';
+                        card.style.transition = 'none';
+                        this.setupDragAndDrop(card);
+                        container.appendChild(card);
+                        
+                        const w = container.clientWidth || window.innerWidth;
+                        const h = container.clientHeight || window.innerHeight;
+                        const cardW = card.offsetWidth || 150;
+                        const cardH = card.offsetHeight || 50;
+                        const heading = document.querySelector('#screen-mission3 > .absolute.top-8');
+                        const headingH = heading ? heading.getBoundingClientRect().height : 90;
+                        const trash = document.getElementById('m3-trash-wrapper');
+                        const trashH = trash ? trash.getBoundingClientRect().height : 140;
+                        const margin = Math.min(12, w * .025);
+                        const minX = margin;
+                        const maxX = Math.max(minX, w - cardW - margin);
+                        const minY = Math.min(Math.max(headingH + 12, 8), Math.max(8, h - cardH - 8));
+                        const maxY = Math.max(minY, h - cardH - trashH - 20);
+                        const x = minX + Math.random() * (maxX - minX);
+                        const y = minY + Math.random() * (maxY - minY);
+                        const rot = (Math.random() - .5) * 28;
+                        
+                        card.style.left = `${x}px`;
+                        card.style.top = `${y}px`;
+                        card.style.transform = `rotate(${rot}deg) scale(0)`;
+                        void card.offsetWidth;
+                        card.style.transition = 'transform .4s cubic-bezier(.175,.885,.32,1.275), opacity .2s';
+                        card.style.opacity = '1';
+                        card.style.transform = `rotate(${rot}deg) scale(1)`;
+                    }, i * 200 + 300);
+                });
+            },
+
+            clampM3CardsToViewport() {
+                const screen = document.getElementById('screen-mission3');
+                const container = document.getElementById('m3-cards-container');
+                if (!screen || !container || !screen.classList.contains('active')) return;
+                const w = container.clientWidth, h = container.clientHeight;
+                const heading = document.querySelector('#screen-mission3 > .absolute.top-8');
+                const minY = (heading?.getBoundingClientRect().height || 90) + 10;
+                const trash = document.getElementById('m3-trash-wrapper');
+                const bottomLimit = h - (trash?.getBoundingClientRect().height || 140) - 18;
+                container.querySelectorAll('.bad-vibe-card:not(.sucked)').forEach(card => {
+                    const maxX = Math.max(4, w - card.offsetWidth - 4);
+                    const maxY = Math.max(minY, bottomLimit - card.offsetHeight);
+                    card.style.left = `${Math.min(Math.max(4, parseFloat(card.style.left) || 4), maxX)}px`;
+                    card.style.top = `${Math.min(Math.max(minY, parseFloat(card.style.top) || minY), maxY)}px`;
+                });
+            },
+
+            setupDragAndDrop(card) {
+                let isDragging = false;
+                let startX, startY, initialLeft, initialTop;
+
+                const onDragStart = (e) => {
+                    isDragging = true;
+                    this.m3DraggedCard = card;
+                    card.style.zIndex = "30";
+                    card.style.transition = "none"; 
+                    
+                    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                    
+                    startX = clientX;
+                    startY = clientY;
+                    initialLeft = parseFloat(card.style.left || card.offsetLeft);
+                    initialTop = parseFloat(card.style.top || card.offsetTop);
+                    
+                    document.addEventListener('mousemove', onDragMove, {passive: false});
+                    document.addEventListener('touchmove', onDragMove, {passive: false});
+                    document.addEventListener('mouseup', onDragEnd);
+                    document.addEventListener('touchend', onDragEnd);
+                };
+
+                const onDragMove = (e) => {
+                    if (!isDragging) return;
+                    e.preventDefault(); 
+                    
+                    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                    
+                    const dx = clientX - startX;
+                    const dy = clientY - startY;
+                    card.style.left = `${initialLeft + dx}px`;
+                    card.style.top = `${initialTop + dy}px`;
+                    this.checkTrashHover(card);
+                };
+
+                const onDragEnd = () => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    this.m3DraggedCard = null;
+                    card.style.zIndex = "20";
+                    card.style.transition = "transform 0.1s"; 
+                    
+                    document.removeEventListener('mousemove', onDragMove);
+                    document.removeEventListener('touchmove', onDragMove);
+                    document.removeEventListener('mouseup', onDragEnd);
+                    document.removeEventListener('touchend', onDragEnd);
+                    this.checkTrashDrop(card);
+                };
+
+                card.addEventListener('mousedown', onDragStart);
+                card.addEventListener('touchstart', onDragStart, {passive: false});
+            },
+
+            checkTrashHover(card) {
+                const trashBin = document.getElementById('m3-trash-body');
+                const lid = document.getElementById('m3-trash-lid');
+                const cardRect = card.getBoundingClientRect();
+                const trashRect = trashBin.getBoundingClientRect();
+                
+                const isOverlapping = !(
+                    cardRect.right < trashRect.left || 
+                    cardRect.left > trashRect.right || 
+                    cardRect.bottom < trashRect.top || 
+                    cardRect.top > trashRect.bottom
+                );
+
+                if (isOverlapping) lid.classList.add('open');
+                else lid.classList.remove('open');
+            },
+
+            checkTrashDrop(card) {
+                const trashBin = document.getElementById('m3-trash-body');
+                const lid = document.getElementById('m3-trash-lid');
+                const cardRect = card.getBoundingClientRect();
+                const trashRect = trashBin.getBoundingClientRect();
+                
+                const isOverlapping = !(
+                    cardRect.right < trashRect.left || 
+                    cardRect.left > trashRect.right || 
+                    cardRect.bottom < trashRect.top || 
+                    cardRect.top > trashRect.bottom
+                );
+
+                lid.classList.remove('open');
+                if (isOverlapping) {
+                    card.classList.add('sucked');
+                    setTimeout(() => {
+                        this.createSparkles(trashRect.left + trashRect.width/2, trashRect.top);
+                        this.showDeleteToast(trashRect.left + trashRect.width/2, trashRect.top);
+                        card.remove();
+                        this.m3Remaining--;
+                        this.updateM3Counter();
+                        
+                        if (this.m3Remaining <= 0) {
+                            setTimeout(() => this.showFinalM3Popup(), 1000);
+                        }
+                    }, 300); 
+                }
+            },
+
+            showDeleteToast(x, y) {
+                const container = document.getElementById('screen-mission3');
+                const toast = document.createElement('div');
+                toast.className = 'delete-toast font-pixelify';
+                toast.textContent = "BAD VIBE DELETED ✓";
+                toast.style.left = `${x - 80}px`;
+                toast.style.top = `${y - 20}px`;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 1000);
+            },
+
+            updateM3Counter() {
+                const counter = document.getElementById('m3-counter');
+                if (this.m3Remaining > 0) {
+                    counter.textContent = `${this.m3Remaining} Thoughts Remaining`;
+                } else {
+                    counter.textContent = "0 Negative Thoughts Remaining";
+                    counter.style.color = "var(--mint)"; 
+                }
+            },
+
+            showFinalM3Popup() {
+                const wrapper = document.getElementById('m3-final-wrapper');
+                const finalPopup = document.getElementById('m3-final-popup');
+                wrapper.classList.remove('hidden');
+                finalPopup.classList.add('animate-[popIn_0.5s_ease-out_forwards]');
+            },
+
+            finishMission3() {
+                let progress = JSON.parse(localStorage.getItem('creammiiProgress') || '{}');
+                progress.currentMission = 4;
+                localStorage.setItem('creammiiProgress', JSON.stringify(progress));
+                this.goToScreen('screen-mission4');
+                this.startMission4();
+            },
+
+            m4Tiles: [], 
+            m4DraggingIndex: null, 
+            m4ImageUrl: "",
+            m4GridSize: 3,
+
+            startMission4() {
+                document.getElementById('task-m4').classList.add('active');
+                document.getElementById('task-m4').textContent = "✓ M4";
+                
+                const desktop = document.getElementById('m4-desktop-view');
+                const viewer = document.getElementById('m4-viewer-window');
+                desktop.classList.remove('opacity-0', 'pointer-events-none');
+                viewer.classList.add('hidden', 'scale-90', 'opacity-0');
+                viewer.classList.remove('scale-100', 'opacity-100');
+                
+                document.getElementById('m4-puzzle-grid').classList.remove('hidden');
+                document.getElementById('m4-final-img').classList.add('hidden');
+                document.getElementById('m4-next-btn').classList.add('hidden');
+                document.getElementById('m4-message-container').innerHTML = '';
+            },
+
+            openM4Folder() {
+                const desktop = document.getElementById('m4-desktop-view');
+                const viewer = document.getElementById('m4-viewer-window');
+                desktop.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    viewer.classList.remove('hidden');
+                    setTimeout(() => {
+                        viewer.classList.remove('scale-90', 'opacity-0');
+                        viewer.classList.add('scale-100', 'opacity-100');
+                    }, 50);
+                    this.initPuzzle();
+                }, 300);
+            },
+
+            initPuzzle() {
+                this.m4ImageUrl = "https://i.postimg.cc/cCYvpzWN/LINE-ALBUM-10102026-261010-7.jpg";
+                document.getElementById('m4-final-img').src = this.m4ImageUrl;
+                this.m4Tiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+                for (let i = this.m4Tiles.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [this.m4Tiles[i], this.m4Tiles[j]] = [this.m4Tiles[j], this.m4Tiles[i]];
+                }
+                let isSolved = true;
+                for(let i=0; i<9; i++) { if(this.m4Tiles[i] !== i) isSolved = false; }
+                if(isSolved) [this.m4Tiles[0], this.m4Tiles[1]] = [this.m4Tiles[1], this.m4Tiles[0]];
+
+                this.renderPuzzle();
+            },
+
+            renderPuzzle() {
+                const grid = document.getElementById('m4-puzzle-grid');
+                grid.innerHTML = '';
+                this.m4Tiles.forEach((tileValue, index) => {
+                    const tile = document.createElement('div');
+                    tile.className = 'puzzle-tile relative';
+                    tile.dataset.index = index; 
+                    
+                    const correctRow = Math.floor(tileValue / this.m4GridSize);
+                    const correctCol = tileValue % this.m4GridSize;
+                    
+                    tile.style.backgroundImage = `url(${this.m4ImageUrl})`;
+                    tile.style.backgroundSize = `300% auto`; 
+                    tile.style.backgroundPosition = `${correctCol * 50}% ${correctRow * 50}%`;
+                    tile.style.userSelect = 'none'; 
+                    tile.style.touchAction = 'none'; 
+
+                    this.setupM4DragAndDrop(tile, index);
+                    grid.appendChild(tile);
+                });
+            },
+
+            setupM4DragAndDrop(tile, index) {
+                let isDragging = false;
+                let clone = null;
+
+                const onStart = (e) => {
+                    if (e.type === 'mousedown' && e.button !== 0) return; 
+                    if (document.getElementById('m4-flash').classList.contains('flash-anim')) return; 
+
+                    isDragging = true;
+                    this.m4DraggingIndex = index;
+
+                    const rect = tile.getBoundingClientRect();
+                    clone = tile.cloneNode(true);
+                    clone.style.position = 'fixed';
+                    clone.style.left = rect.left + 'px';
+                    clone.style.top = rect.top + 'px';
+                    clone.style.width = rect.width + 'px';
+                    clone.style.height = rect.height + 'px';
+                    clone.style.zIndex = '9999';
+                    clone.style.pointerEvents = 'none'; 
+                    clone.style.opacity = '0.85';
+                    clone.style.boxShadow = '0 8px 16px rgba(0,0,0,0.4)';
+                    clone.style.transform = 'scale(1.1)'; 
+                    document.body.appendChild(clone);
+
+                    tile.style.opacity = '0.3'; 
+
+                    document.addEventListener('mousemove', onMove, {passive: false});
+                    document.addEventListener('touchmove', onMove, {passive: false});
+                    document.addEventListener('mouseup', onEnd);
+                    document.addEventListener('touchend', onEnd);
+                };
+
+                const onMove = (e) => {
+                    if (!isDragging || !clone) return;
+                    e.preventDefault(); 
+                    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+                    clone.style.left = (clientX - clone.offsetWidth / 2) + 'px';
+                    clone.style.top = (clientY - clone.offsetHeight / 2) + 'px';
+                };
+
+                const onEnd = (e) => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    const clientX = e.type.includes('mouse') ? e.clientX : e.changedTouches[0].clientX;
+                    const clientY = e.type.includes('mouse') ? e.clientY : e.changedTouches[0].clientY;
+
+                    if (clone) clone.remove();
+                    tile.style.opacity = '1';
+
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('touchmove', onMove);
+                    document.removeEventListener('mouseup', onEnd);
+                    document.removeEventListener('touchend', onEnd);
+
+                    const elem = document.elementFromPoint(clientX, clientY);
+                    const dropTarget = elem ? elem.closest('.puzzle-tile') : null;
+                    
+                    if (dropTarget) {
+                        const targetIndex = parseInt(dropTarget.dataset.index);
+                        if (!isNaN(targetIndex) && targetIndex !== this.m4DraggingIndex) {
+                            const temp = this.m4Tiles[this.m4DraggingIndex];
+                            this.m4Tiles[this.m4DraggingIndex] = this.m4Tiles[targetIndex];
+                            this.m4Tiles[targetIndex] = temp;
+                            this.renderPuzzle();
+                            this.checkPuzzleComplete();
+                        }
+                    }
+                };
+
+                tile.addEventListener('mousedown', onStart);
+                tile.addEventListener('touchstart', onStart, {passive: false});
+            },
+
+            checkPuzzleComplete() {
+                for(let i = 0; i < 9; i++) { if (this.m4Tiles[i] !== i) return; }
+                this.winPuzzle();
+            },
+
+            winPuzzle() {
+                const flash = document.getElementById('m4-flash');
+                flash.classList.add('flash-anim');
+                setTimeout(() => {
+                    document.getElementById('m4-puzzle-grid').classList.add('hidden');
+                    document.getElementById('m4-final-img').classList.remove('hidden');
+                }, 150); 
+                setTimeout(() => { this.playM4Message(); }, 1000);
+            },
+
+            m4Messages: [
+                "พี่ยังคงอยากบอกหนูว่า\nรอยยิ้มของหนูมันสดใสและน่ารักมาก ๆ",
+                "ยิ้มเยอะ ๆ นะคนเก่ง ♡"
+            ],
+
+            playM4Message() {
+                const msgContainer = document.getElementById('m4-message-container');
+                msgContainer.innerHTML = '';
+                let currentLine = 0;
+                let charIndex = 0;
+                
+                const typeChar = () => {
+                    if (currentLine < this.m4Messages.length) {
+                        const fullText = this.m4Messages[currentLine];
+                        if (charIndex < fullText.length) {
+                            if (fullText.charAt(charIndex) === '\n') msgContainer.appendChild(document.createElement('br'));
+                            else msgContainer.innerHTML += fullText.charAt(charIndex);
+                            charIndex++;
+                            setTimeout(typeChar, 50); 
+                        } else {
+                            currentLine++;
+                            charIndex = 0;
+                            if(currentLine < this.m4Messages.length) {
+                                msgContainer.appendChild(document.createElement('br'));
+                                msgContainer.appendChild(document.createElement('br'));
+                            }
+                            setTimeout(typeChar, 800);
+                        }
+                    } else {
+                        setTimeout(() => { document.getElementById('m4-next-btn').classList.remove('hidden'); }, 500);
+                    }
+                };
+                typeChar();
+            },
+
+            finishMission4() {
+                let progress = JSON.parse(localStorage.getItem('creammiiProgress') || '{}');
+                progress.currentMission = 5;
+                localStorage.setItem('creammiiProgress', JSON.stringify(progress));
+                this.goToScreen('screen-mission5');
+                this.startMission5();
+            },
+
+            m5Printing: false,
+
+            startMission5() {
+                document.getElementById('task-m5').classList.add('active');
+                document.getElementById('task-m5').textContent = "✓ M5";
+                this.m5Printing = false; 
+                
+                const now = new Date();
+                document.getElementById('receipt-date').textContent = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                const mask = document.getElementById('m5-receipt-mask');
+                mask.style.height = "0px";
+            },
+
+            startPrinting() {
+                if (this.m5Printing) return; 
+                this.m5Printing = true;
+
+                const led = document.getElementById('printer-led');
+                led.classList.replace('bg-red-400', 'bg-[var(--mint)]');
+                led.classList.add('animate-pulse');
+                
+                document.getElementById('m5-tap-hint').classList.add('hidden');
+                document.getElementById('m5-printer-machine').classList.remove('hover:scale-105', 'cursor-pointer');
+
+                const printerBody = document.getElementById('m5-printer-body');
+                printerBody.classList.add('shake');
+                printerBody.style.animationIterationCount = "infinite"; 
+
+                const paper = document.getElementById('m5-receipt-paper');
+                const targetHeight = paper.offsetHeight;
+                const mask = document.getElementById('m5-receipt-mask');
+                
+                setTimeout(() => {
+                    mask.style.height = `${targetHeight}px`; 
+                }, 100);
+
+                setTimeout(() => {
+                    printerBody.style.animationIterationCount = "0"; 
+                    printerBody.classList.remove('shake');
+                    document.getElementById('printer-led').classList.remove('animate-pulse');
+                    
+                    this.shootConfetti();
+                    setInterval(() => this.shootConfetti(), 4000);
+                    
+                    setTimeout(() => {
+                        document.getElementById('m5-save-btn').classList.remove('hidden');
+                    }, 1500);
+                }, 3100); 
+            },
+
+            shootConfetti() {
+                const screen = document.getElementById('screen-mission5');
+                const colors = ['#FFB7D5', '#9B8AFB', '#B8E8D4', '#FFE69A', '#ffffff'];
+                
+                for (let i = 0; i < 60; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.className = 'confetti-piece';
+                        confetti.style.left = `${Math.random() * 100}vw`;
+                        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.animationDuration = `${Math.random() * 2 + 2}s`; 
+                        screen.appendChild(confetti);
+                        setTimeout(() => confetti.remove(), 4000);
+                    }, i * 30);
+                }
+            },
+            
+            saveMemory() {
+                const btn = document.getElementById('m5-save-btn');
+                const taskbar = document.getElementById('taskbar');
+                const captureArea = document.getElementById('screen-mission5');
+                
+                btn.style.display = 'none';
+                taskbar.style.display = 'none';
+                
+                setTimeout(() => {
+                    html2canvas(captureArea, {
+                        scale: 2, 
+                        useCORS: true, 
+                        allowTaint: true, 
+                        backgroundColor: "#FFF8EE" 
+                    }).then(canvas => {
+                        btn.style.display = 'block';
+                        taskbar.style.display = 'flex';
+
+                        const link = document.createElement('a');
+                        link.download = 'Creammii_Memory.png';
+                        link.href = canvas.toDataURL('image/png', 1.0);
+                        link.click();
+                    }).catch(err => {
+                        console.error("Screenshot failed:", err);
+                        btn.style.display = 'block';
+                        taskbar.style.display = 'flex';
+                    });
+                }, 200); 
+            }
+        };
+
+        window.onload = () => {
+            app.init();
+        };
+    </script>
+</body>
+</html>
